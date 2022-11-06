@@ -48,12 +48,13 @@ FROM conan_tools as kernel_tools
         apt-get install -y bison && \
         apt-get install -y flex && \
         apt-get install -y libssl-dev && \
-        apt-get install -y libncurses-dev && \
         apt-get install -y python3-ply && \
         apt-get install -y python3-git && \
         apt-get install -y libgmp3-dev && \
         apt-get install -y libmpc-dev && \
-        apt-get install crossbuild-essential-armhf
+        apt-get install crossbuild-essential-armhf && \
+		apt-get install -y libncurses5-dev
+
 
 # User image
 FROM kernel_tools as user_image
