@@ -53,7 +53,8 @@ FROM conan_tools as kernel_tools
         apt-get install -y libgmp3-dev && \
         apt-get install -y libmpc-dev && \
         apt-get install -y crossbuild-essential-armhf && \
-		apt-get install -y libncurses5-dev
+		apt-get install -y libncurses5-dev && \
+		apt-get install -y kmod
 
 
 # User image

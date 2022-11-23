@@ -73,15 +73,15 @@ That command will export an env variable, which will be later used by build syst
 ```
 5. Build base kernel iamge (zImage)
 ```
-    make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- Image
+    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- Image
 ```
 6. Build kernel modules (as followed by kernel config)
 ```
-    make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules
+    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- modules
 ```
 7. Build device tree blob
 ```
-    make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- dtbs
+    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- dtbs
 ```
 ======================================================================================================================================
 
@@ -98,7 +98,32 @@ After that, on the SD we shall have 2 partitions:
 /root (/sdb2) - That partition contains all abut filesystem (ext4 filesystem)
 
 Install instruction for Linux:
+
 1. Put your sd card to computer, mount it
+1.1. Check if sd card is accesible.
+```
+sudo fdisk -l /dev/sdb
+```
+That command will show sd card partitions and its filesystem. Example output:
+```
+Device     Boot  Start      End  Sectors  Size Id Type
+/dev/sdb1         8192   532479   524288  256M  c W95 FAT32 (LBA)
+/dev/sdb2       532480 60506111 59973632 28,6G 83 Linux
+```
+1.2. Now, we can mount the partitions in a selected place, like:
+
+! Full list of supported filesystems can be found in /proc/filesystems and /lib/modules/$(uname -r)/kernel/fs for a complete list of the filesystems !
+```
+mkdir -p /home/ap/Projects/RPi4/sd/boot
+mkdir -p /home/ap/Projects/RPi4/sd/root
+sudo mount -t vfat /dev/sdb1 /home/ap/Projects/RPi4/sd/boot
+sudo mount -t ext4 /dev/sdb2 /home/ap/Projects/RPi4/sd/root
+```
+After that you should be able to see content of the sd card in mounted `boot` and `root` directories.
+
+! If you use docker container, that directories can be mounted to the container as a volume !
+
+
 2. Use `lsblk` program to play with SD card
 
     -> HowTo access SD card from Virtual Machine: https://scribles.net/accessing-sd-card-from-linux-virtualbox-guest-on-windows-host/
