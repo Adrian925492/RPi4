@@ -2,8 +2,8 @@
 
 # FOR USE OUTSIDE DOCKER !
 
-ROOT_DIR=/home/ap/Projects/RPi4/sd/boot
-BOOT_DIR=/home/ap/Projects/RPi4/sd/root
+ROOT_DIR=/home/ap/Projects/RPi4/sd/root
+BOOT_DIR=/home/ap/Projects/RPi4/sd/boot
 
 mkdir -p $ROOT_DIR
 mkdir -p $BOOT_DIR

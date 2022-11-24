@@ -4,4 +4,4 @@
 
 cd /repo/RPi4/linux
 KERNEL=kernel7l
-make -j 8  ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- modules
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig

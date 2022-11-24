@@ -124,7 +124,57 @@ After that you should be able to see content of the sd card in mounted `boot` an
 ! If you use docker container, that directories can be mounted to the container as a volume !
 
 
-2. Use `lsblk` program to play with SD card
+-> HowTo access SD card from Virtual Machine: https://scribles.net/accessing-sd-card-from-linux-virtualbox-guest-on-windows-host/
 
-    -> HowTo access SD card from Virtual Machine: https://scribles.net/accessing-sd-card-from-linux-virtualbox-guest-on-windows-host/
-    
+! If you need, you can mount the /boot and /root direcotried into the container. According to that setup it is mounted in `/repo/RPi4/sd`.
+
+2. Copy the artifacts into sd card
+
+2.1. Copy kernel image:
+```
+env PATH=$PATH make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- INSTALL_MOD_PATH=/repo/RPi4/sd/root modules_install
+```
+
+2.2. Copy boot stuffs
+```
+sudo cp /repo/RPi4/sd/boot/$KERNEL.img /repo/RPi4/sd/boot/$KERNEL-backup.img
+sudo cp arch/arm/boot/zImage /repo/RPi4/sd/boot/$KERNEL.img
+sudo cp arch/arm/boot/dts/*.dtb /repo/RPi4/sd/boot/
+sudo cp arch/arm/boot/dts/overlays/*.dtb* /repo/RPi4/sd/boot/overlays/
+sudo cp arch/arm/boot/dts/overlays/README /repo/RPi4/sd/boot/overlays/
+```
+
+3. Check serial settings
+
+Serial settings can be checked in `/boot/config.txt` and `/boot/console.txt`. The fistr file allows to enable serial access by adding the following entry at the end of file:
+```
+enable_uart=1
+```
+
+And the second file allows to modify serial settings (baudrates, parity etc.)
+
+4. Umount the sd card
+From VMachine do:
+```
+sudo umount /home/ap/Projects/RPi4/sd/boot
+sudo umount /home/ap/Projects/RPi4/sd/root
+```
+
+4. Put the sd card into rpi and start. Observe output on srial console.
+
+### Part 3.2 Burn via usb sd card reader
+
+## Part 4. Kernel configuration
+
+Linux kernel i a large and complicated piece of software. The kernel can be configured before compilation to allow user to switch between required features and options, and modify some of them.
+
+To do so, type:
+
+```
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig
+```
+
+That will run menu for configuration.
+
+All configurations will be written in `.config` file in `/linux` directory. It can be also modified by hand, without menuconfig tool usage.
+

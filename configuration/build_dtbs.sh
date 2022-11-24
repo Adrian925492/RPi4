@@ -4,4 +4,4 @@
 
 cd /repo/RPi4/linux
 KERNEL=kernel7l
-make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- dtbs
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- dtbs

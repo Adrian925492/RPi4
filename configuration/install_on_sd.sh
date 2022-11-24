@@ -17,5 +17,6 @@ cp arch/arm/boot/zImage $BOOT_DIR/$KERNEL.img
 
 # Copy device tree blobs
 cp arch/arm/boot/dts/*.dtb $BOOT_DIR
-cp arch/arm/boot/dts/overlays/*.dtb* $BOOT_DIR/overlays/
-cp arch/arm/boot/dts/overlays/README $BOOT_DIR/overlays/
+mkdir -p $BOOT_DIR/overlays
+cp -r arch/arm/boot/dts/overlays/*.dtb* $BOOT_DIR/overlays/
+cp -r arch/arm/boot/dts/overlays/README $BOOT_DIR/overlays/
