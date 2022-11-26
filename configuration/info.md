@@ -1,5 +1,8 @@
 #Raspberry Pi4 linux kernel toolchain build and driver development
 
+Basic RPI configuration:
+username: pi
+password: pi
 
 ## Part 1. Starting RPI with default image
 
@@ -97,6 +100,19 @@ After that, on the SD we shall have 2 partitions:
 /boot (/sdb1) - That partition contains all about boot process (fat filesystem)
 /root (/sdb2) - That partition contains all abut filesystem (ext4 filesystem)
 
+In boot partition we have:
+-> kernel image for specified architectures (for pure bare metal only suitable for the platfor image can be left)
+-> boot binary
+-> config.txt file - with basic boot configuration
+-> cmdline.txt - which sets serial console output of the boot process
+-> device tree blobs
+
+In root partition we have
+-> kenrel modules (/root/lib/modules)
+-> root filesystem
+-> initial process (started after boot) - named /bin/init
+
+
 Install instruction for Linux:
 
 1. Put your sd card to computer, mount it
@@ -163,6 +179,14 @@ sudo umount /home/ap/Projects/RPi4/sd/root
 4. Put the sd card into rpi and start. Observe output on srial console.
 
 ### Part 3.2 Burn via usb sd card reader
+
+Burning image via UDB card reader is much simpler. 
+
+1. Put the USB card reader into PC
+
+2. Set "Devices" menu of the running VMachine, set USB card reader. It will be automatically mounted in a guest OS in `/media/ap/boot` for boot partiton and `/media/ap/root` for toor partition.
+
+3. You can store the files directly on the partitions. It can be also easily mounted in the container.
 
 ## Part 4. Kernel configuration
 
