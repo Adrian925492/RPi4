@@ -21,7 +21,8 @@ FROM base_tools as dev_tools
 		apt-get install -y g++ && \
 		apt-get install -y gdb && \
 		apt-get install -y cmake && \
-		apt-get install -y libtbb-dev
+		apt-get install -y libtbb-dev && \
+		apt-get install -y rsync
 
 # Code checkers
 FROM dev_tools as checkers_tools
@@ -53,6 +54,7 @@ FROM conan_tools as kernel_tools
         apt-get install -y libgmp3-dev && \
         apt-get install -y libmpc-dev && \
         apt-get install -y crossbuild-essential-armhf && \
+		apt-get install -y crossbuild-essential-arm64 && \
 		apt-get install -y libncurses5-dev && \
 		apt-get install -y kmod
 

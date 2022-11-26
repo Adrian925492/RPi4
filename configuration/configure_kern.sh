@@ -2,6 +2,6 @@
 
 # FOR USE IN DOCKER CONTAINER ONLY !
 
-cd /repo/RPi4/linux
-KERNEL=kernel7
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- bcm2709_defconfig
+cd /repo/linux
+KERNEL=kernel8
+make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- bcm2711_defconfig

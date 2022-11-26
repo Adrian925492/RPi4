@@ -202,3 +202,9 @@ That will run menu for configuration.
 
 All configurations will be written in `.config` file in `/linux` directory. It can be also modified by hand, without menuconfig tool usage.
 
+## Part 5. Device tree
+
+The base device tree for Raspberry Pi 4 B (4GB) is stored in `/linux/arch/arm/boot/dts/bcm2711-rpi-4-b.dts`. The device tree files for both 32 ans 64 bit kenel types are the same.
+
+
+
