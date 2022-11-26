@@ -206,5 +206,42 @@ All configurations will be written in `.config` file in `/linux` directory. It c
 
 The base device tree for Raspberry Pi 4 B (4GB) is stored in `/linux/arch/arm/boot/dts/bcm2711-rpi-4-b.dts`. The device tree files for both 32 ans 64 bit kenel types are the same.
 
+Overlays are dtb files that overlays the base devicetree settings. It is used to add an extra layers describing hardware that can be connected to the board. Overlay source files are stored in `/boot/overlays1 direcotry.
+
+More about device tree: https://blog.stabel.family/raspberry-pi-4-device-tree/
+
+## Part 6. Access threw ssh
+
+To have an access to the RPI threw SSH yu need to attach it to the network.
+
+Instruction: https://stevessmarthomeguide.com/configuring-networking-raspberry-pi/
+
+To check status of the network just type `ifconfig` command.
+
+The `eth0` interface corresponds to ethernet port, and `wlanX` interfaces to wifi.
+
+#### Configure over ethernet
+
+1. Put ethernet cable into ethernet port and connect it to router. The router dhcp will add ip for the rpi and it will be pingable in your lan network.
+
+That way is much easier than configuring wifi.
+
+#### Configure over wifi:
+
+Follow instruction on: https://binaryupdates.com/how-to-configure-wifi-on-raspberry-pi-4/
+
+! It can be also configured during flashing base image by raspberryPi flasher !
+
+
+#### Configuring ssh on the rpi
+
+https://raspberrypi-guide.github.io/networking/connecting-via-ssh
+
+https://phoenixnap.com/kb/enable-ssh-raspberry-pi
+
+After configuration, you can use ssh services over rpi by:
+
+`ssh -p 22 pi@<IP>`
+
 
 
