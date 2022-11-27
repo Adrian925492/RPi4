@@ -210,6 +210,44 @@ Overlays are dtb files that overlays the base devicetree settings. It is used to
 
 More about device tree: https://blog.stabel.family/raspberry-pi-4-device-tree/
 
+### Overlays
+
+Device tree overlay is a kernel build-in device tree extension mechanism. The overlay is a .dtb file (copiled .dts), which overlays selected piece of hardware. It can be used to add/modify selected piece of device tree configuration.
+
+The overlays are stored in `/boot/overlays` directory and loaded with .dtb file at boot mode.
+
+To enable overlay we have to modyfi `config.txt` file as follows
+```
+dtoverlay=my-overlay
+```
+That entry enables "my-overlay.dtb" file.
+
+Using overlays: https://hackaday.com/2022/04/04/a-power-button-for-raspberry-pi-courtesy-of-device-tree-overlays/
+                https://www.cnblogs.com/qiengo/p/5915508.html
+
+#### Building overlays
+
+Way 1: build with whole device tree (cross compile)
+1. Put overlay file named like `XXXX-overlay.dts` in an catalogue wih overlays for the device `/linux/arch64/boot/dts/overlays`.
+2. Add your overlay in Makefile in above catalogue like:
+```
+...
+	wm8960-soundcard.dtbo \
+	my.dtbo
+
+targets += dtbs dtbs_install
+...
+```
+3. Compile whole dtb database, burn it to sd card
+4. Enable your overlay in `/boot/config.txt` file.
+
+
+#### The overlay pattern
+
+Overal pattern of how to write overlay file is described in: https://github.com/raspberrypi/firmware/blob/master/boot/overlays/README
+
+
+
 ## Part 6. Access threw ssh
 
 To have an access to the RPI threw SSH yu need to attach it to the network.
@@ -245,3 +283,28 @@ After configuration, you can use ssh services over rpi by:
 
 
 
+## Part 7. Kernel modules
+
+The kernel modules are special parts of software that can be understoowd as separetly compiled adiditonal software features working in kernel space. It is stored in `/lib/modules` on the device.
+
+The module itself needs to handle specified pattern nd needs to be compiled as a module. For compile the module we will need also kernel headers for our kernel version.
+
+The module can be build directly on the machine or crosscompiled and burned.
+
+### Direct build
+
+1. Make sure you have kernel headers installed (see /usr/src/linux-headers-<version>). If it is not installed, you cna install t on the machine by:
+```
+sudo apt install raspberrypi-kernel-headers
+```
+Please notice, that it will install the headers for latest kernel version.
+2. Build the module using make
+After build, what is important is `<module_name>.ko` file, which is the module to be loaded to the kernel.
+3. Load the module by 
+```
+sudo insmod <modulename>.ko
+```
+You can examine if module has been loaded by typing `lsmod` command and check if your module is on he list.
+
+! If you used `printk()` you can examine efects by using `dmesg` command.
+4. To remove the module use `sudo rmmod <modbane>` command.

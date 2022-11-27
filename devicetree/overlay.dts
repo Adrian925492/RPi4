@@ -1,0 +1,16 @@
+/dts-v1/;
+/plugin/;
+
+/{
+	compatible = "brcm,bcm2835";
+    fragment@0 {
+        target-path = <&leds>
+        __overlay__ {
+            usr_led_2:usr2  {
+                label = "usrLed2";
+                linux,default-trigger = "default-on";
+                gpios = <&gpio 18 GPIO_ACTIVE_HIGH>;
+            }
+		};
+	};
+};
