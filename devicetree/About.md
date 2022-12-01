@@ -37,9 +37,9 @@ The root node, which is master node for each other nodes in a tree is represente
 The properwies can be represented by several type of data:
 -> String property, ex. `name = "sone string property";
 -> Cell property - a 32bit intigers delimited by space, like a tuple, ex. `name = < 123 0x23 0xabcd>;`
--> Binary property - a list of data, ex`name = [0x01 0x02 0x03 0x04];
--> Combined type property - set of data with different types can be assigned to a single key using "," separator, ex: `name = "string", <1 2 3>, [0x01 0x02 0x03 0x04];
--> Lists of strings - set of data with only string types can be written with coma "," separators as well, ex:`name = "str1", "str2";
+-> Binary property - a list of data, ex`name = [0x01 0x02 0x03 0x04];`
+-> Combined type property - set of data with different types can be assigned to a single key using "," separator, ex: `name = "string", <1 2 3>, [0x01 0x02 0x03 0x04];`
+-> Lists of strings - set of data with only string types can be written with coma "," separators as well, ex:`name = "str1", "str2";`
 
 Each property nas a `;` sign at the end - like in C-style structure.
 
