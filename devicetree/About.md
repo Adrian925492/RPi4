@@ -300,3 +300,55 @@ Example:
     };
 };
 ```
+
+#### Special properties
+
+* aliases - A specific node is normally referenced by the full path, like /external-bus/ethernet@0,0, but that gets cumbersome when what a user really wants to know is, "which device is eth0?" The aliases node can be used to assign a short alias to a full device path. For example:
+```
+    aliases {
+        ethernet0 = &eth0;
+        serial0 = &serial0;
+    };
+```
+* choosen - the prperty does not represents the real hardware device, it is used to pass data between boot and kernel, like boot arguments. Data in the chosen node does not represent the hardware. Typically the chosen node is left empty in .dts source files and populated at boot time.
+
+```
+    chosen {
+        bootargs = "root=/dev/nfs rw nfsroot=192.168.1.1 console=ttyS0,115200";
+    };
+```
+
+#### Other entries
+Full list of linux typical device tree entries can be found in https://elinux.org/images/c/cf/Power_ePAPR_APPROVED_v1.1.pdf.
+
+## UIO
+
+The UIO is a linux mechanism that allows to directly access hardware resources like memory, registers and/or interrupts from user sace. With UIO usage the the driver of a device is mostly written in user space, while in kernel space we have just a little build-in kernel module that just exposes hardware resources to the user space.
+
+The uio devices are accesed threw `/dev/uioX` files in linux filesystem. It is created in a standard way from user space, by linux driver or by devicetree.
+
+The most common way of usage the uio devices is providing access to soe registers of some device, memory or interrupt handling.
+
+### UIO interrupts
+
+Interrupts are handheld by blocking `read()` unction called of `/dev/uioX` file. The funstion keeps blocked on the file untill an interrupt occurs. Also `select()` function can be used for that purpose. The total number read from `/dev/uioX` device is an interrupt counter.
+
+In case if we have more than one interrupt attached to node handheld by uio device, and the interrupts are not masked at start, the kernel disables the interrupt at the beginning to avid situation the user has no knowledge from where an interrupt came. In such case, we have an option to reenable selected interrupt (by number), by writing to the `/dev/uioX` file using function `write(intNr)`. The `write()` method will thencall an `irqcontrol()` function applied per-interrupt in user space driver, in which we can enable or disable the interrupt.
+
+### UIO attributes
+
+* name - keeps the name of the uio. Can be found in `/sys/class/uio/uioX/name`.
+* version - keeps the content of version string defined by uio kernel driver. Can be found in `/sys/class/uio/uioX/version`.
+* event - keeps number of interrupt occurences from last uio file read. Can be found in `/sys/class/uio/uioX/event`.
+
+### UIO memory mapping
+
+The uio device can be used to access an usersapce to some part of memory. That mappings, if used, are stored in `/sys/class/uio/uioX/maps/mapX`. The mappings are created by giving entries to `reg` rperty of the device tree. That memory regions can be accessed using `mmap()` function in a user space driver. Mappings are numered from 0, according to order in `reg` property. Each mapping has a properties like:
+* name - in `/name`
+* addr - contains memory address, in `/addr`
+* size - contians total mapped memory size, in bytes, in `/size`
+* offset - contains offset in bytes that has to be added to actual pointer returned by mmap() function to get the memory. It is important if the device memory is not page alligned, beacouse mmap() always retuns page alligned pointer. Can be found in `/offset`.
+
+The base kernel driver handling uio devices is `uio_pdrv_genirq`. In order to use uio just use that name in compatible property of the device tree. Other properties that are needed is an reg property for mapping memory (needed or not - depending on chip), optionally #size-cells and #address-cells, an interrupt property, if we want to use an interrupt.
+
+More information can be found in: https://www.kernel.org/doc/html/v4.14/driver-api/uio-howto.html
