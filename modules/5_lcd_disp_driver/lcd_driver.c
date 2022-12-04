@@ -29,6 +29,10 @@ static char lcd_buffer[17];
 unsigned int gpios[] = {
 	25, 	/* Enable pin */
 	23, 	/* RS pin */
+	16,		/* D0 pin */
+	12, 	/* D1 pin */
+	19, 	/* D2 pin */
+	13, 	/* D3 pin */
 	4, 		/* D4 pin */
 	17, 	/* D5 pin */
 	27, 	/* D6 pin */
@@ -43,29 +47,62 @@ unsigned int gpios[] = {
  */
 void lcd_enable(void) {
 	gpio_set_value(ENABLE_PIN, 1);
-	msleep(5);	//Wait 5 ms
+	msleep(7);	//Wait 5 ms
 	gpio_set_value(ENABLE_PIN, 0);
 }
 
+// /*
+// /**
+//  * @brief Function to write major 4 bits to display
+//  */
+// void lcd_send_rhalf(char data) {
+// 	int i;
+// 	for (i = 0; i < 4; i++)
+// 	{
+// 		gpio_set_value(gpios[i+2], (data & (1 << (i + 4))) >> (i + 4));
+// 			printk("gpio%d, %d : %d, ",gpios[i+2], i, (data & (1 << (i + 4))) >> (i + 4));
+// 	}
+// }
+
+// /**
+//  * @brief Function to write least 4 bits to display
+//  */
+// void lcd_send_lhalf(char data) {
+// 	int i;
+// 	for (i = 0; i < 4; i++)
+// 	{
+// 		gpio_set_value(gpios[i+2], (data & (1 << i)) >> i);
+// 			printk("gpio%d, %d : %d, ",gpios[i+2], i, (data & (1 << i)) >> i);
+// 	}
+// }
+
+// /**
+//  * @brief Function to send bytes on 4bit data interface
+//  * @param data: Data to be sent
+//  */
+// void lcd_send_data(char data) {
+// 		printk("Data to sent: 0x%X\n [", data);
+// 	lcd_send_rhalf(data);
+// 		printk("], [");
+// 	lcd_enable();
+
+// 	lcd_send_lhalf(data);
+// 		printk(" ]\n");
+// 	lcd_enable();
+
+// 	msleep(5);
+// }
+// /*
+
 /**
- * @brief Function to send bytes on 4bit data interface
- * @param data: Data to be sent
+ * @brief set the 8 bit data bus
+ * @param data: Data to set
  */
-void lcd_send_data(char data) {
+void lcd_send_byte(char data) {
 	int i;
-
-	for (i=4; i<8; i++) {
-		gpio_set_value(gpios[i-2], ((data) && (1<<i) >> i));
-	}
-
+	for(i=0; i<8; i++)
+		gpio_set_value(gpios[i+2], ((data) & (1<<i)) >> i);
 	lcd_enable();
-
-	for (i=0; i<4; i++) {
-		gpio_set_value(gpios[i+2], ((data) && (1<<i)) >> i);
-	}
-
-	lcd_enable();
-
 	msleep(5);
 }
 
@@ -75,7 +112,7 @@ void lcd_send_data(char data) {
  */
 void lcd_cmd(uint8_t data) {
 	gpio_set_value(RS_PIN, 0);	//RS pin to instruction mode
-	lcd_send_data(data);
+	lcd_send_byte(data);
 }
 
 /**
@@ -84,7 +121,7 @@ void lcd_cmd(uint8_t data) {
  */
 void lcd_data(uint8_t data) {
 	gpio_set_value(RS_PIN, 1);	//RS pin to data mode
-	lcd_send_data(data);
+	lcd_send_byte(data);
 }
 
 /*
@@ -104,7 +141,7 @@ static ssize_t driver_write(struct file* File, const char* user_buffer, size_t c
 	delta = to_copy - not_copied;
 
 	/* Set the new data to the display */
-	lcd_cmd(0x1); //Clear the display
+	lcd_cmd(0x10); //Clear the display
 
 	for (i = 0; i < to_copy; i++) {
 		lcd_data(lcd_buffer[i]);	//Send data byte
@@ -137,6 +174,41 @@ static struct file_operations fops = {
 	.write = driver_write
 };
 
+/**
+ * @brief This function initializes the LCD
+ */
+void lcd_init(void) {
+	gpio_set_value(ENABLE_PIN, 0);
+	gpio_set_value(RS_PIN, 0);
+	msleep(1);
+
+	// //Set the 4-bit interface and init the display
+	// lcd_send_lhalf(0x03);
+	// msleep(5);
+	// lcd_send_lhalf(0x03);
+	// msleep(1);
+	// lcd_send_lhalf(0x03);
+	// msleep(1);
+
+	// lcd_send_lhalf(0x02);
+	// msleep(1);
+
+	// lcd_cmd(0x20);
+	// lcd_cmd(0x06);
+
+	// msleep(1);
+
+	// lcd_cmd(0x0f);		//Turn the display on, blink cursor, zero pos
+	// //lcd_cmd(0x01);
+
+	/* Init the display */
+	lcd_cmd(0x30);	/* Set the display for 8 bit data interface */
+
+	lcd_cmd(0xf);	/* Turn display on, turn cursor on, set cursor blinking */
+
+	lcd_cmd(0x1);
+}
+
 #define DRIVER_NAME "my_lcd_driver"
 #define DRIVER_CLASS "myLcdModuleClass"
 /**
@@ -144,7 +216,7 @@ static struct file_operations fops = {
  */
 static int __init ModuleInit(void) {
 	int i;
-	char *names[] = {"ENABLE_PIN", "RS_PIN", "DATA_PIN4", "DATA_PIN5", "DATA_PIN6", "DATA_PIN7"};
+	char *names[] = {"ENABLE_PIN", "REGISTER_SELECT", "DATA_PIN0", "DATA_PIN1", "DATA_PIN2", "DATA_PIN3", "DATA_PIN4", "DATA_PIN5", "DATA_PIN6", "DATA_PIN7"};
     printk("Hello World,  Lcd driver device!\n");      //Will print to linux kernel logs!
 
 	/* Allocatea device number */
@@ -180,7 +252,7 @@ static int __init ModuleInit(void) {
 	/* Initialize gpios */
 	printk("lcd_driver - GPIO init\n");
 
-	for (i = 0; i < 6; i++) {
+	for (i = 0; i < 10; i++) {
 		if(gpio_request(gpios[i], names[i])) {
 			printk("Can not allocate gpio %d\n", gpios[i]);
 			goto gpioInitError;
@@ -189,7 +261,7 @@ static int __init ModuleInit(void) {
 
 	printk("gpio - setpins as output\n");
 
-	for (i = 0; i < 6; i++) {
+	for (i = 0; i < 10; i++) {
 		if(gpio_direction_output(gpios[i], 0)) {
 			printk("Can not allocate gpio %d\n", gpios[i]);
 			goto gpioDirectionError;
@@ -197,16 +269,9 @@ static int __init ModuleInit(void) {
 	}
 
 	/* Init the lcd display */
-	lcd_cmd(0x02);		//Set display for 4 bit interface
-	// lcd_cmd(0x28);		//Turn the display on, cursor on, set the cursor blinking */
-	// lcd_cmd(0x01);		//Clear the display
-	// lcd_cmd(0x0c);
-	// lcd_cmd(0x06);
+	lcd_init();
 
-	lcd_cmd(0xf);
-	lcd_cmd(0x1);
-
-	char text[] = "Hello world!";
+	char text[] = "ABCDE";
 	for (i = 0; i<sizeof(text)-1; i++) {
 		lcd_data(text[i]);
 	}
@@ -240,7 +305,7 @@ ClassError:
 	int i;
 	lcd_cmd(0x01);		/* Clear the display */
 
-	for(i=0; i<6; i++) {
+	for(i=0; i<10; i++) {
 		gpio_set_value(gpios[i], 0);
 		gpio_free(gpios[i]);
 	}
