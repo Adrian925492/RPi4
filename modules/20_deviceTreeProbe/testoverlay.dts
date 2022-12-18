@@ -1,0 +1,21 @@
+/dts-v1/;
+/plugin/;
+/ {
+    compatible = "brcm,bcm2835";
+    fragment@0 {
+        target-path="/";
+        __overlay__ {
+            me_device {
+                compatible = "brightloght, mydev";
+                status="okay";
+                label = "Test";
+                my_value = <12>;
+            };
+        };
+    };
+};
+
+//Build the overlay:    dtc -@ -I dts -o dtbo -o testoverlay.dtbo testoverlay.dts 
+//Insert the overlay:   sudo dtoverlay testoverlay.dtbo (on the device)
+//Check if overlay is loaded:   sudo ls /proc/device-tree/
+// If there is an overlay loaded, it will be on the list
