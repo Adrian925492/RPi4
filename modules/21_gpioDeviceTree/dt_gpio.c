@@ -74,11 +74,12 @@ static int dt_probe(struct platform_device *pdev) { //pdev - struct contains all
     }
     printk("dr_probe - label is %s\n", label);
 
-    ret = device_property_read_u32(dev, "my_value", my_value);
+    ret = device_property_read_u32(dev, "my_value", &my_value);
     if (ret) {
         printk("dtprobe error - device property my_value read error!\n");
         return -1;
     }
+    printk("dr_probe - my_value is %d\n", my_value);
 
     /* Initialize the gpios */
     my_led = gpiod_get(dev, "led", GPIOD_OUT_LOW);   //Initializes gpio according to passed config and returns a handler to gpio obj
@@ -86,8 +87,6 @@ static int dt_probe(struct platform_device *pdev) { //pdev - struct contains all
         printk("dtprobe error - error setting gpio!\n");
         return -1 * IS_ERR(my_led);
     }
-
-    printk("dr_probe - my_value is %d\n", my_value);
 
     return 0;
 }
