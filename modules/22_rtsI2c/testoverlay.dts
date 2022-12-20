@@ -1,0 +1,23 @@
+/dts-v1/;
+/plugin/;
+/ {
+	compatible = "brcm,bcm2835";
+	fragment@0 {
+		target = <&i2c1>;
+		__overlay__ {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			my_rtc: my_rtc@68 {
+				compatible = "brightlight,myrtc";
+				status = "okay";
+				label = "Test";
+				reg = <0x68>;
+			};
+		};
+	};
+};
+
+//Build the overlay:    dtc -@ -I dts -o dtbo -o testoverlay.dtbo testoverlay.dts 
+//Insert the overlay:   sudo dtoverlay testoverlay.dtbo (on the device)
+//Check if overlay is loaded:   sudo ls /proc/device-tree/
+// If there is an overlay loaded, it will be on the list
